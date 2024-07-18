@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Number Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+    h1 {
+      color: #343a40;
+    }
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      top: 20px;
+    }
+    #searchInput {
+      width: 50%;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #results {
+      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+    }
+  </style>
+  <script>
+    const sheetUrl = 'https://docs.google.com/spreadsheets/u/0/d/1wp6FU8-C_1lP57gLIYmy57idWIjvcxO549i3rQzmv7w/htmlview'; // Replace with your published Google Sheet URL
+
+    async function fetchSheetData() {
+      const response = await fetch(sheetUrl);
+      const data = await response.text();
+      const parsedData = parseCSV(data);
+      return parsedData;
+    }
+
+    function parseCSV(csv) {
+      const rows = csv.split('\n');
+      return rows.map(row => row.split(',').map(cell => cell.trim()));
+    }
+
+    function searchInSheet() {
+      const searchValue = document.getElementById('searchInput').value.toLowerCase();
+      fetchSheetData().then(data => {
+        let found = false;
+        let results = '';
+        for (let i = 0; i < data.length; i++) {
+          for (let j = 0; j < data[i].length; j++) {
+            if (data[i][j].toLowerCase().includes(searchValue)) {
+              found = true;
+              results += `Verified! found at row ${i + 1}, column ${j + 1}<br>`;
+            }
+          }
+        }
+        if (!found) {
+          results = 'Value not found';
+        }
+        document.getElementById('results').innerHTML = results;
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Proyojonio Bazar verification</h2>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="verify order">
+    <button onclick="searchInSheet()">Search</button>
+  </div>
+  <div id="results"></div>
+</body>
+</html>
